@@ -7,9 +7,6 @@
 
 'use strict';
 
-/* Directives */
-
-
 angular.module('myApp.directives', ['myApp.filters'])
   .directive('myDialog', function() {
     return {
@@ -43,22 +40,8 @@ angular.module('myApp.directives', ['myApp.filters'])
           footer = $('.im_page_footer')[0],
           moreNotified = false;
 
-      onContentLoaded(function () {
-        $(dialogsWrap).nanoScroller({preventPageScrolling: true, tabIndex: -1, iOSNativeScrolling: true});
-      });
-
-      var updateScroller = function () {
-        onContentLoaded(function () {
-          $(dialogsWrap).nanoScroller();
-        });
-      }
-
-      $scope.$on('ui_dialogs_prepend', updateScroller);
-
-
       $scope.$on('ui_dialogs_append', function () {
         onContentLoaded(function () {
-          updateScroller();
           moreNotified = false;
 
           $timeout(function () {
@@ -69,7 +52,6 @@ angular.module('myApp.directives', ['myApp.filters'])
 
       $scope.$on('ui_dialogs_change', function () {
         onContentLoaded(function () {
-          updateScroller();
           moreNotified = false;
 
           $timeout(function () {
@@ -79,21 +61,17 @@ angular.module('myApp.directives', ['myApp.filters'])
       });
 
       $(scrollableWrap).on('scroll', function (e) {
-        // console.log('scroll', moreNotified);
         if (!moreNotified && scrollableWrap.scrollTop >= scrollableWrap.scrollHeight - scrollableWrap.clientHeight - 300) {
-          // console.log('emit need more');
           $scope.$emit('dialogs_need_more');
           moreNotified = true;
         }
       });
-
 
       function updateSizes () {
         if (attrs.modal) {
           $(element).css({
             height: $($window).height() - 200
           });
-          updateScroller();
           return;
         }
 
@@ -107,14 +85,13 @@ angular.module('myApp.directives', ['myApp.filters'])
           height: $($window).height() - footer.offsetHeight - (headWrap ? headWrap.offsetHeight : 44) - 72
         });
 
-        updateScroller();
       }
 
       $($window).on('resize', updateSizes);
 
       updateSizes();
       setTimeout(updateSizes, 1000);
-    };
+    }
 
   })
 
@@ -130,7 +107,6 @@ angular.module('myApp.directives', ['myApp.filters'])
           contactsWrap = $('.contacts_wrap', element)[0];
 
       onContentLoaded(function () {
-        $(contactsWrap).nanoScroller({preventPageScrolling: true, tabIndex: -1, iOSNativeScrolling: true});
         updateSizes();
       });
 
@@ -138,14 +114,13 @@ angular.module('myApp.directives', ['myApp.filters'])
         $(element).css({
           height: $($window).height() - (panelWrap && panelWrap.offsetHeight || 0) - (searchWrap && searchWrap.offsetHeight || 0) - 200
         });
-        $(contactsWrap).nanoScroller();
       }
 
       $($window).on('resize', updateSizes);
       $scope.$on('contacts_change', function () {
-        onContentLoaded(updateSizes)
+        onContentLoaded(updateSizes);
       });
-    };
+    }
 
   })
 
@@ -171,16 +146,7 @@ angular.module('myApp.directives', ['myApp.filters'])
 
       onContentLoaded(function () {
         scrollableWrap.scrollTop = scrollableWrap.scrollHeight;
-        $(historyWrap).nanoScroller({preventPageScrolling: true, tabIndex: -1, iOSNativeScrolling: true});
       });
-
-      var updateScroller = function (delay) {
-        $timeout(function () {
-          if (!$(scrollableWrap).hasClass('im_history_to_bottom')) {
-            $(historyWrap).nanoScroller();
-          }
-        }, delay || 0);
-      }
 
       var transform = false,
           trs = ['transform', 'webkitTransform', 'MozTransform', 'msTransform', 'OTransform'],
@@ -211,7 +177,6 @@ angular.module('myApp.directives', ['myApp.filters'])
             $(historyMessagesEl).removeClass('im_history_appending');
             scrollableWrap.scrollTop = scrollableWrap.scrollHeight;
             $(historyMessagesEl).css(transform, 'translate(0px, ' + (scrollableWrap.scrollHeight - wasH) + 'px)');
-            $(historyWrap).nanoScroller();
             var styles = {};
             styles[transform] = 'translate(0px, 0px)';
             $(historyMessagesEl).addClass('im_history_appending');
@@ -225,7 +190,6 @@ angular.module('myApp.directives', ['myApp.filters'])
             $(scrollable).css({bottom: ''});
             scrollableWrap.scrollTop = scrollableWrap.scrollHeight;
             updateBottomizer();
-            $(historyWrap).nanoScroller();
           }
         });
       });
@@ -246,7 +210,6 @@ angular.module('myApp.directives', ['myApp.filters'])
             scrollableWrap.scrollTop = scrollableWrap.scrollHeight;
           }
 
-          updateScroller();
           moreNotified = false;
 
           $timeout(function () {
@@ -258,7 +221,6 @@ angular.module('myApp.directives', ['myApp.filters'])
       $scope.$on('ui_history_focus', function () {
         if (!atBottom) {
           scrollableWrap.scrollTop = scrollableWrap.scrollHeight;
-          updateScroller();
           atBottom = true;
         }
       });
@@ -346,10 +308,8 @@ angular.module('myApp.directives', ['myApp.filters'])
         if (atBottom) {
           onContentLoaded(function () {
             scrollableWrap.scrollTop = scrollableWrap.scrollHeight;
-            updateScroller();
           });
         }
-        updateScroller(100);
       }
 
       function updateBottomizer () {
@@ -357,7 +317,6 @@ angular.module('myApp.directives', ['myApp.filters'])
         if (historyMessagesEl.offsetHeight > 0 && historyMessagesEl.offsetHeight <= scrollableWrap.offsetHeight) {
           $(historyMessagesEl).css({marginTop: (scrollableWrap.offsetHeight - historyMessagesEl.offsetHeight - 20 - 44) + 'px'});
         }
-        $(historyWrap).nanoScroller();
       }
 
       $($window).on('resize', updateSizes);
@@ -663,15 +622,9 @@ angular.module('myApp.directives', ['myApp.filters'])
             cleanup();
           }
         });
-      })
+      });
 
       var cleanup = angular.noop;
-      // function () {
-      //   setTimeout(function () {
-      //     $scope.$destroy()
-      //     stopWatching();
-      //   }, 0);
-      // };
     }
 
   })
